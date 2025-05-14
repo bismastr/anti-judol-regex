@@ -57,5 +57,5 @@ func main() {
 		render.JSON(w, r, handler.NewSuccessResponse(http.StatusOK, response))
 	})
 
-	http.ListenAndServe(":8080", r)
+	http.ListenAndServe(":4527", r)
 }
