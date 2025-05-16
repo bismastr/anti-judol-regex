@@ -10,5 +10,4 @@ func NewSuccessResponse(status int, data interface{}) *Response {
 		Status: status,
 		Data:   data,
 	}
-
 }
