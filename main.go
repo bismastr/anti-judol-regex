@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
+
 	"github.com/bismastr/anti-judol-regex/internal/handler"
+	"github.com/bismastr/anti-judol-regex/internal/llm"
 	"github.com/bismastr/anti-judol-regex/internal/regex"
 	"github.com/bismastr/anti-judol-regex/internal/server"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/cors"
+	"github.com/bismastr/anti-judol-regex/internal/web_analyze"
 )
 
 type RegexResponse struct {
@@ -18,21 +20,15 @@ type Regex struct {
 }
 
 func main() {
-	r := chi.NewRouter()
-
-	r.Use(cors.Handler(cors.Options{
-		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins: []string{"https://*", "http://*"},
-		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
-		MaxAge:           300, // Maximum value not ignored by any of major browsers
-	}))
+	ctx := context.Background()
+	llmService, err := llm.NewLlmService(ctx)
+	if err != nil {
+		panic(err)
+	}
 
 	regexService := regex.NewRegexService()
-	h := handler.NewHandler(regexService)
+	webAnalyzeService := web_analyze.NewWebAnalyzeService(llmService)
+	h := handler.NewHandler(regexService, webAnalyzeService)
 	s, err := server.NewServer(h)
 	if err != nil {
 		panic(err)
