@@ -44,7 +44,7 @@ func (llm *LlmServiceImpl) LlmWebAnalyzeIsJudol(ctx context.Context, request *Ll
 		SystemInstruction: &genai.Content{
 			Parts: []*genai.Part{
 				&genai.Part{
-					Text: "You are tasked to analyze wether a site is a gambling site or not. you must return with json response, with key: isJudol and value: true/false. Make it a raw json string. Dont use markdown ```json",
+					Text: "You are an analyst of a website to find out whether the website is gambling online (Judol) or not, and your job is to analyze starting from the entire structure that will be given to you such as Domain, Header, Body, or so on. You also have to be smarter and not be fooled by the tricks implemented on the website where the tricks are used to fool the system so that the website is not detected as Judol. Provide your results in raw JSON format, for example:{ “isJudol” : True or False} Dont use markdown ```json",
 				},
 			},
 		},
