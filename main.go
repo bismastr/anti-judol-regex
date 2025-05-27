@@ -28,7 +28,7 @@ func main() {
 
 	regexService := regex.NewRegexService()
 	webAnalyzeService := web_analyze.NewWebAnalyzeService(llmService)
-	h := handler.NewHandler(regexService, webAnalyzeService)
+	h := handler.NewHandler(regexService, webAnalyzeService, llmService)
 	s, err := server.NewServer(h)
 	if err != nil {
 		panic(err)
