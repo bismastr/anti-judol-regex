@@ -20,7 +20,8 @@ type LlmAnalyzeAndConvertToRegexRequest struct {
 }
 
 type LlmAnalyzeAndConvertToRegexResponse struct {
-	RegexResult string `json:"regexResult"`
+	GambeleWord string `json:"gamble_word"`
+	Regex       string `json:"regex"`
 }
 
 type LlmAnalyzeWebIsJudolRequest struct {
@@ -153,7 +154,10 @@ func (llm *LlmServiceImpl) AnalyzeAndConvertToRegex(ctx context.Context, request
 		return nil, fmt.Errorf("failed to generate content: %w", err)
 	}
 
-	return &LlmAnalyzeAndConvertToRegexResponse{RegexResult: result.Text()}, nil
+	var response []*LlmAnalyzeAndConvertToRegexResponse
+	json.Unmarshal([]byte(result.Text()), &response)
+
+	return response[0], nil
 }
 
 func analyzeAndConvertToRegexRequestToContent(request *LlmAnalyzeAndConvertToRegexRequest) (string, error) {
