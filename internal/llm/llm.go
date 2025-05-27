@@ -125,6 +125,18 @@ func (llm *LlmServiceImpl) AnalyzeAndConvertToRegex(ctx context.Context, request
 
 	config := &genai.GenerateContentConfig{
 		SystemInstruction: genai.NewContentFromText(systemPrompt, genai.RoleUser),
+		ResponseMIMEType:  "application/json",
+		ResponseSchema: &genai.Schema{
+			Type: genai.TypeArray,
+			Items: &genai.Schema{
+				Type: genai.TypeObject,
+				Properties: map[string]*genai.Schema{
+					"gamble_word": {Type: genai.TypeString},
+					"regex":       {Type: genai.TypeString},
+				},
+				PropertyOrdering: []string{"gamble_word", "regex"},
+			},
+		},
 	}
 
 	reqString, err := analyzeAndConvertToRegexRequestToContent(request)
