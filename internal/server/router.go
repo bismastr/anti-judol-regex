@@ -21,6 +21,7 @@ func NewRouter(h *handler.Handler) (*chi.Mux, error) {
 		r.Route("/v1", func(r chi.Router) {
 			r.Get("/regex", h.GetRegexList)
 			r.Post("/analyze", h.WebAnalyzeIsJudol)
+			r.Post("/regex/analyze", h.AnalyzeAndConvertToRegex)
 		})
 	})
 

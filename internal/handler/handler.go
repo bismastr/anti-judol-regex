@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/bismastr/anti-judol-regex/internal/llm"
 	"github.com/bismastr/anti-judol-regex/internal/regex"
 	"github.com/bismastr/anti-judol-regex/internal/web_analyze"
 	"github.com/go-chi/render"
@@ -11,12 +12,14 @@ import (
 type Handler struct {
 	regexService      regex.RegexService
 	webAnalyzeService web_analyze.WebAnalyzeService
+	llmService        llm.LlmService
 }
 
-func NewHandler(regexService regex.RegexService, webAnalyzeService web_analyze.WebAnalyzeService) *Handler {
+func NewHandler(regexService regex.RegexService, webAnalyzeService web_analyze.WebAnalyzeService, llmService llm.LlmService) *Handler {
 	return &Handler{
 		regexService:      regexService,
 		webAnalyzeService: webAnalyzeService,
+		llmService:        llmService,
 	}
 }
 
@@ -36,6 +39,20 @@ func (h *Handler) WebAnalyzeIsJudol(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response, err := h.webAnalyzeService.WebAnalyzeIsJudol(r.Context(), data)
+	if err != nil {
+		render.Render(w, r, ErrInvalidRequest(err))
+	}
+
+	render.JSON(w, r, NewSuccessResponse(200, response))
+}
+
+func (h *Handler) AnalyzeAndConvertToRegex(w http.ResponseWriter, r *http.Request) {
+	data := &llm.LlmAnalyzeAndConvertToRegexRequest{}
+	if err := render.Bind(r, data); err != nil {
+		render.Render(w, r, ErrInvalidRequest(err))
+	}
+
+	response, err := h.llmService.AnalyzeAndConvertToRegex(r.Context(), data)
 	if err != nil {
 		render.Render(w, r, ErrInvalidRequest(err))
 	}
