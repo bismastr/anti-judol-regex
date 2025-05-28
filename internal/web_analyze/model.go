@@ -6,8 +6,8 @@ import (
 )
 
 type WebAnalyzeResponse struct {
-	IsJudol     bool   `json:"isJudol"`
-	IsNewDomain bool   `json:"isNewDomain"`
+	IsJudol     bool   `json:"is_judol"`
+	IsNewDomain bool   `json:"is_new_domain"`
 	Message     string `json:"message"`
 }
 
