@@ -1,29 +1,50 @@
 package regex
 
+import (
+	"context"
+
+	"github.com/bismastr/anti-judol-regex/internal/llm"
+)
+
 type RegexService interface {
 	GetRegexList() (*RegexResponse, error)
+	RegexAnalyze(ctx context.Context, request *RegexAnlyzeRequest) (*RegexAnalyzeResponse, error)
 }
 
 type RegexServiceImpl struct {
+	LlmService llm.LlmService
 }
 
-func NewRegexService() *RegexServiceImpl {
-	return &RegexServiceImpl{}
+func NewRegexService(llmService llm.LlmService) *RegexServiceImpl {
+	return &RegexServiceImpl{
+		LlmService: llmService,
+	}
 }
 
-type RegexResponse struct {
-	TotalData int      `json:"totalData"`
-	RegexList *[]Regex `json:"regexList"`
-}
+func (s *RegexServiceImpl) RegexAnalyze(ctx context.Context, request *RegexAnlyzeRequest) (*RegexAnalyzeResponse, error) {
+	llmResponse, err := s.LlmService.LlmTextAnalyzeToRegex(ctx, &llm.LlmTextAnalyzeToRegexRequest{Text: request.Text})
+	if err != nil {
+		return nil, err
+	}
 
-type Regex struct {
-	Regex string `json:"regex"`
+	response := RegexAnalyzeResponse{
+		TotalJudolText: len(llmResponse),
+	}
+
+	//TODO save the judol regex into databse
+	if len(llmResponse) < 1 {
+		response.Message = "Your reported text is not containing judol"
+	} else {
+		response.Message = "Thank you for reporting, our LLM analyzed that your reported text is containing judol."
+	}
+
+	return &response, nil
 }
 
 func (s *RegexServiceImpl) GetRegexList() (*RegexResponse, error) {
 	response := &RegexResponse{
 		TotalData: 10,
-		RegexList: &[]Regex{
+		RegexList: []*Regex{
 			{
 				Regex: "m+\\s*[a4]+\\s*x+\\s*w+\\s*i+\\s*n+",
 			},
@@ -50,9 +71,6 @@ func (s *RegexServiceImpl) GetRegexList() (*RegexResponse, error) {
 			},
 			{
 				Regex: "c+\\s*u+\\s*[a4]+\\s*n+",
-			},
-			{
-				Regex: "",
 			},
 		},
 	}

@@ -45,3 +45,28 @@ func TestLlmIsJudol(t *testing.T) {
 
 	assert.False(t, response.IsJudol)
 }
+
+func TestLlmAnalyzeRegex(t *testing.T) {
+	ctx := context.Background()
+	llmClient, err := llm.NewLlmService(ctx)
+	if err != nil {
+		t.Fatalf("cannot create llm client %v", err)
+	}
+
+	llmService := LlmService{
+		llmClient,
+	}
+
+	response, err := llmService.LlmTextAnalyzeToRegex(ctx, &llm.LlmTextAnalyzeToRegexRequest{
+		Text: []string{
+			"Bikin mood naik! 𝐏𝐋𝐔𝐓𝐎𝟖𝟖",
+			"Tersedia promo menarik dari ambil4d, poipet308, dan rajajudi88 dengan bonus melimpah.",
+			"Doa terbaik untuk perkembangan channel yang terus melaju kencang! 𝑷𝒐𝒊𝒑𝒆𝒕𝟑𝟎𝟖",
+		},
+	})
+	if err != nil {
+		t.Fatalf("Cannot analyze regex %v", err)
+	}
+
+	assert.Equal(t, len(response), 4)
+}

@@ -47,12 +47,12 @@ func (h *Handler) WebAnalyzeIsJudol(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) AnalyzeAndConvertToRegex(w http.ResponseWriter, r *http.Request) {
-	data := &llm.LlmAnalyzeAndConvertToRegexRequest{}
+	data := &regex.RegexAnlyzeRequest{}
 	if err := render.Bind(r, data); err != nil {
 		render.Render(w, r, ErrInvalidRequest(err))
 	}
 
-	response, err := h.llmService.AnalyzeAndConvertToRegex(r.Context(), data)
+	response, err := h.regexService.RegexAnalyze(r.Context(), data)
 	if err != nil {
 		render.Render(w, r, ErrInvalidRequest(err))
 	}
