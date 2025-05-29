@@ -4,20 +4,23 @@ import (
 	"context"
 
 	"github.com/bismastr/anti-judol-regex/internal/llm"
+	"github.com/bismastr/anti-judol-regex/internal/repository"
 )
 
 type RegexService interface {
-	GetRegexList() (*RegexResponse, error)
+	GetRegexList(ctx context.Context) (*RegexResponse, error)
 	RegexAnalyze(ctx context.Context, request *RegexAnlyzeRequest) (*RegexAnalyzeResponse, error)
 }
 
 type RegexServiceImpl struct {
 	LlmService llm.LlmService
+	Repository *repository.Queries
 }
 
-func NewRegexService(llmService llm.LlmService) *RegexServiceImpl {
+func NewRegexService(llmService llm.LlmService, repository *repository.Queries) *RegexServiceImpl {
 	return &RegexServiceImpl{
 		LlmService: llmService,
+		Repository: repository,
 	}
 }
 
@@ -41,38 +44,25 @@ func (s *RegexServiceImpl) RegexAnalyze(ctx context.Context, request *RegexAnlyz
 	return &response, nil
 }
 
-func (s *RegexServiceImpl) GetRegexList() (*RegexResponse, error) {
+func (s *RegexServiceImpl) GetRegexList(ctx context.Context) (*RegexResponse, error) {
+	regex, err := s.Repository.GetRegexList(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var totalRegex []*Regex
+	for _, r := range regex {
+		tempRegex := &Regex{
+			Word:  r.Word,
+			Regex: r.Regex,
+		}
+
+		totalRegex = append(totalRegex, tempRegex)
+	}
+
 	response := &RegexResponse{
-		TotalData: 10,
-		RegexList: []*Regex{
-			{
-				Regex: "m+\\s*[a4]+\\s*x+\\s*w+\\s*i+\\s*n+",
-			},
-			{
-				Regex: "j+\\s*[a4]+\\s*c+\\s*k+\\s*p+\\s*[o0]+\\s*t+",
-			},
-			{
-				Regex: "p+\\s*e+\\s*t+\\s*i+\\s*r+",
-			},
-			{
-				Regex: "z+\\s*e+\\s*u+\\s*s+",
-			},
-			{
-				Regex: "k+\\s*[a4]+\\s*k+\\s*e+\\s*k+",
-			},
-			{
-				Regex: "g+\\s*[a4]+\\s*c+\\s*[o0]+\\s*r+",
-			},
-			{
-				Regex: "g+\\s*u+\\s*a+\\s*c+\\s*[o0]+\\s*r+",
-			},
-			{
-				Regex: "t+\\s*[e3]+\\s*r+\\s*p+\\s*[e3]+\\s*r+\\s*c+\\s*[a4]+\\s*y+\\s*[a4]+",
-			},
-			{
-				Regex: "c+\\s*u+\\s*[a4]+\\s*n+",
-			},
-		},
+		TotalData: len(regex),
+		RegexList: totalRegex,
 	}
 
 	return response, nil

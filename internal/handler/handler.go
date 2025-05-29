@@ -24,7 +24,7 @@ func NewHandler(regexService regex.RegexService, webAnalyzeService web_analyze.W
 }
 
 func (h *Handler) GetRegexList(w http.ResponseWriter, r *http.Request) {
-	response, err := h.regexService.GetRegexList()
+	response, err := h.regexService.GetRegexList(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

@@ -12,6 +12,7 @@ type Config struct {
 	Env          string
 	Port         string
 	GeminiApiKey string
+	SQLPassword  string
 }
 
 var Envs = initConfig()
@@ -23,6 +24,7 @@ func initConfig() Config {
 		Env:          getEnv("ENV", "dev"),
 		Port:         getEnv("PORT", ":8080"),
 		GeminiApiKey: getEnv("GEMINI_API_KEY", "apiKey"),
+		SQLPassword:  getEnv("DB_PASSWORD", "notapassword"),
 	}
 }
 
