@@ -14,6 +14,7 @@ type Regex struct {
 
 type RegexAnalyzeResponse struct {
 	TotalJudolText int    `json:"total_judol_text"`
+	DuplicatedWord int    `json:"duplicated_word"`
 	Message        string `json:"message"`
 }
 
@@ -22,5 +23,20 @@ type RegexAnlyzeRequest struct {
 }
 
 func (request *RegexAnlyzeRequest) Bind(r *http.Request) error {
+	return nil
+}
+
+type InsertRegexRequest struct {
+	Word  string `json:"word"`
+	Regex string `json:"regex"`
+}
+
+type InsertRegexResponse struct {
+	Word    string `json:"word"`
+	Regex   string `json:"regex"`
+	Message string `json:"message"`
+}
+
+func (request *InsertRegexRequest) Bind(r *http.Request) error {
 	return nil
 }
