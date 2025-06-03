@@ -52,16 +52,17 @@ func (s *RegexServiceImpl) RegexAnalyze(ctx context.Context, request *RegexAnlyz
 		Message: "Thank you for reporting, our AI will analyze your reported text.",
 	}
 
-	go func() {
-		llmResponse, _ := s.LlmService.LlmTextAnalyzeToRegex(ctx, &llm.LlmTextAnalyzeToRegexRequest{Text: request.Text})
-
-		s.processLLMResponse(ctx, llmResponse)
-	}()
+	go s.processLLMResponse(context.Background(), request.Text)
 
 	return &response, nil
 }
 
-func (s *RegexServiceImpl) processLLMResponse(ctx context.Context, llmResponse []*llm.LlmTextAnalyzeToRegexResponse) error {
+func (s *RegexServiceImpl) processLLMResponse(ctx context.Context, text []string) error {
+	llmResponse, err := s.LlmService.LlmTextAnalyzeToRegex(ctx, &llm.LlmTextAnalyzeToRegexRequest{Text: text})
+	if err != nil {
+		return err
+	}
+
 	for _, regex := range llmResponse {
 		exist, err := s.Repository.WordExists(ctx, regex.GambeleWord)
 		if err != nil {
