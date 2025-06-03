@@ -21,7 +21,7 @@ func NewServer(h *handler.Handler) (*Server, error) {
 	}
 
 	srv := http.Server{
-		Addr:    ":4527",
+		Addr:    "0.0.0.0:4527",
 		Handler: r,
 	}
 
