@@ -35,6 +35,13 @@ func (llm *LlmServiceImpl) LlmWebAnalyzeIsJudol(ctx context.Context, request *Ll
 	systemPrompt := "You are tasked to analyze wether a site is a gambling site or not. you must return with json response, with key: isJudol and value: true/false. Make it a raw json string. Dont use markdown ```json"
 	config := genai.GenerateContentConfig{
 		SystemInstruction: genai.NewContentFromText(systemPrompt, genai.RoleModel),
+		ResponseMIMEType:  "application/json",
+		ResponseSchema: &genai.Schema{
+			Type: genai.TypeObject,
+			Properties: map[string]*genai.Schema{
+				"isJudol": {Type: genai.TypeBoolean},
+			},
+		},
 	}
 
 	reqString := fmt.Sprintf("domain: %s webContent: %s", request.Domain, request.WebContent)
@@ -43,7 +50,7 @@ func (llm *LlmServiceImpl) LlmWebAnalyzeIsJudol(ctx context.Context, request *Ll
 		{Text: reqString},
 	}
 
-	result, err := llm.Models.GenerateContent(ctx, "gemini-2.0-flash", []*genai.Content{{Parts: parts}}, &config)
+	result, err := llm.Models.GenerateContent(ctx, "gemini-2.0-flash-lite", []*genai.Content{{Parts: parts}}, &config)
 	if err != nil {
 		return nil, err
 	}
