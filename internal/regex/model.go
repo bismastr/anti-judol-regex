@@ -13,9 +13,7 @@ type Regex struct {
 }
 
 type RegexAnalyzeResponse struct {
-	TotalJudolText int    `json:"total_judol_text"`
-	DuplicatedWord int    `json:"duplicated_word"`
-	Message        string `json:"message"`
+	Message string `json:"message"`
 }
 
 type RegexAnlyzeRequest struct {

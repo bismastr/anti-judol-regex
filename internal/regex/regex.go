@@ -48,45 +48,38 @@ func (s *RegexServiceImpl) InsertRegex(ctx context.Context, request *InsertRegex
 }
 
 func (s *RegexServiceImpl) RegexAnalyze(ctx context.Context, request *RegexAnlyzeRequest) (*RegexAnalyzeResponse, error) {
-	llmResponse, err := s.LlmService.LlmTextAnalyzeToRegex(ctx, &llm.LlmTextAnalyzeToRegexRequest{Text: request.Text})
-	if err != nil {
-		return nil, err
-	}
-
 	response := RegexAnalyzeResponse{
-		TotalJudolText: len(llmResponse),
+		Message: "Thank you for reporting, our AI will analyze your reported text.",
 	}
 
-	if len(llmResponse) == 0 {
-		response.Message = "Your reported text is not containing judol"
-		return &response, nil
-	}
+	go func() {
+		llmResponse, _ := s.LlmService.LlmTextAnalyzeToRegex(ctx, &llm.LlmTextAnalyzeToRegexRequest{Text: request.Text})
 
-	response.Message = "Thank you for reporting, our LLM analyzed that your reported text is containing judol."
+		s.processLLMResponse(ctx, llmResponse)
+	}()
 
-	duplicatedCount := 0
+	return &response, nil
+}
+
+func (s *RegexServiceImpl) processLLMResponse(ctx context.Context, llmResponse []*llm.LlmTextAnalyzeToRegexResponse) error {
 	for _, regex := range llmResponse {
 		exist, err := s.Repository.WordExists(ctx, regex.GambeleWord)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		if exist {
-			duplicatedCount++
-		} else {
+		if !exist {
 			err = s.Repository.InsertRegex(ctx, &repository.Regex{
 				Regex: regex.Regex,
 				Word:  regex.GambeleWord,
 			})
 			if err != nil {
-				return nil, err
+				return err
 			}
 		}
 	}
 
-	response.DuplicatedWord = duplicatedCount
-
-	return &response, nil
+	return nil
 }
 
 func (s *RegexServiceImpl) GetRegexList(ctx context.Context) (*RegexResponse, error) {

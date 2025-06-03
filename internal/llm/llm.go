@@ -43,7 +43,7 @@ func (llm *LlmServiceImpl) LlmWebAnalyzeIsJudol(ctx context.Context, request *Ll
 		{Text: reqString},
 	}
 
-	result, err := llm.Models.GenerateContent(ctx, "gemini-1.5-flash", []*genai.Content{{Parts: parts}}, &config)
+	result, err := llm.Models.GenerateContent(ctx, "gemini-2.0-flash", []*genai.Content{{Parts: parts}}, &config)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (llm *LlmServiceImpl) LlmTextAnalyzeToRegex(ctx context.Context, request *L
 		{Text: reqString},
 	}
 
-	result, err := llm.Models.GenerateContent(ctx, "gemini-1.5-flash", []*genai.Content{{Parts: parts}}, config)
+	result, err := llm.Models.GenerateContent(ctx, "gemini-2.0-flash", []*genai.Content{{Parts: parts}}, config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate content: %w", err)
 	}
